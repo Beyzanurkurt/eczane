@@ -71,4 +71,5 @@ public class DataSeeder implements CommandLineRunner {
 
         System.out.println("✅ TEST VERİLERİ YÜKLENDİ!");
     }
+
 }
