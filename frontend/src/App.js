@@ -5,60 +5,75 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 function App() {
   const [ilaclar, setIlaclar] = useState([]);
 
-  // Sayfa açılınca Backend'den verileri çek
-  useEffect(() => {
+  // Verileri Çek
+  const fetchIlaclar = () => {
     axios.get('http://localhost:8080/api/medicines')
-      .then(response => {
-        setIlaclar(response.data);
-      })
-      .catch(error => console.error("Hata:", error));
+      .then(response => setIlaclar(response.data))
+      .catch(error => console.error("Veri Çekme Hatası:", error));
+  };
+
+  useEffect(() => {
+    fetchIlaclar();
   }, []);
 
-  // Satış Butonuna Basınca Çalışacak Fonksiyon
-  const satisYap = (id) => {
-    // Backend'deki Satış API'sine istek atıyoruz (1 adet sat)
-    axios.post(`http://localhost:8080/api/sales?ilacId=${id}&adet=1`)
+  // --- SATIŞ YAP FONKSİYONU ---
+  const satisYap = (ilacId, ilacAdi) => {
+    
+    // Veritabanındaki Müşteri ID'si (Bunu 60 olarak belirlemiştik)
+    const MUSTERI_ID = 60; 
+
+    const satisPaketi = {
+      customerId: MUSTERI_ID,
+      medicineIds: [ilacId], 
+      quantities: [1]      
+    };
+
+    axios.post('http://localhost:8080/api/orders/satis', satisPaketi)
       .then(response => {
-        alert("✅ " + response.data);
-        window.location.reload(); // Sayfayı yenile ki stok güncellensin
+        alert(`✅ SATIŞ BAŞARILI!\n\nSatılan: ${ilacAdi}\nFatura Tutarı: ${response.data.totalAmount} ₺`);
+        fetchIlaclar(); // Stokları güncellemek için listeyi yenile
       })
       .catch(error => {
-        alert("❌ Hata: " + (error.response ? error.response.data : "Bilinmeyen hata"));
+        console.error("Satış Hatası:", error);
+        alert("❌ HATA: Satış yapılamadı. Stok yetersiz olabilir veya veritabanı bağlantısı koptu.");
       });
   };
 
   return (
     <div className="container mt-5">
-      <h2 className="text-center mb-4">💊 Eczane Satış Ekranı</h2>
+      <h2 className="text-center mb-4">🛒 Hızlı Satış Ekranı</h2>
+      
       <div className="card shadow">
         <div className="card-body">
-          <table className="table table-striped table-hover">
+          <table className="table table-striped table-hover align-middle">
             <thead className="table-dark">
               <tr>
                 <th>ID</th>
                 <th>İlaç Adı</th>
                 <th>Fiyat</th>
                 <th>Stok</th>
-                <th>İşlem</th>
+                <th className="text-center">İşlem</th>
               </tr>
             </thead>
             <tbody>
               {ilaclar.map(ilac => (
                 <tr key={ilac.medicineId}>
                   <td>{ilac.medicineId}</td>
-                  <td>{ilac.name}</td>
+                  <td className="fw-bold">{ilac.name}</td>
                   <td>{ilac.price} ₺</td>
                   <td>
-                    <span className={`badge ${ilac.stockQuantity < 10 ? 'bg-danger' : 'bg-success'}`}>
-                      {ilac.stockQuantity}
-                    </span>
+                    {ilac.stockQuantity < 10 
+                      ? <span className="badge bg-danger">{ilac.stockQuantity} (Kritik)</span> 
+                      : <span className="badge bg-success">{ilac.stockQuantity}</span>
+                    }
                   </td>
-                  <td>
-                    <button
-                      className="btn btn-primary btn-sm"
-                      onClick={() => satisYap(ilac.medicineId)}
+                  <td className="text-center">
+                    <button 
+                        className="btn btn-primary btn-sm px-4"
+                        onClick={() => satisYap(ilac.medicineId, ilac.name)}
+                        disabled={ilac.stockQuantity <= 0}
                     >
-                      Satış Yap (1 Adet)
+                        Satış Yap 💰
                     </button>
                   </td>
                 </tr>

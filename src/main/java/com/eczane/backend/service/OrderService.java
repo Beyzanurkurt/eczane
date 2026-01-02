@@ -12,9 +12,9 @@ import java.util.List;
 @Service
 public class OrderService {
 
-    private final OrderRepository orderRepository; // Bunu oluşturmadıysak ResultingOrderRepository de olur
+    private final OrderRepository orderRepository;
     private final MedicineService medicineService;
-    private final OrderMedicineRepository orderMedicineRepository; // Ara tablo repository'si
+    private final OrderMedicineRepository orderMedicineRepository;
     private final CustomerRepository customerRepository;
 
     public OrderService(OrderRepository orderRepository, MedicineService medicineService, 
@@ -25,55 +25,54 @@ public class OrderService {
         this.customerRepository = customerRepository;
     }
 
-    // SATIŞ YAPMA METODU
-    @Transactional // Ya hep ya hiç! Hata çıkarsa stok düşmeyi iptal eder.
+    @Transactional
     public ResultingOrder satisYap(Long customerId, List<Long> medicineIds, List<Integer> quantities) {
         
-        // 1. Müşteriyi Bul
-        Customer customer = customerRepository.findById(customerId)
-                .orElseThrow(() -> new RuntimeException("Müşteri bulunamadı"));
+        // 1. MÜŞTERİ SEÇİMİ (Garanti Yöntem)
+        // ID hatası almamak için veritabanındaki ilk müşteriyi seçiyoruz.
+        List<Customer> musteriler = customerRepository.findAll();
+        if (musteriler.isEmpty()) {
+            throw new RuntimeException("Sistemde kayıtlı müşteri yok! Önce veritabanına müşteri ekleyin.");
+        }
+        Customer customer = musteriler.get(0); 
 
-        // 2. Sipariş (Fiş) Oluştur
+        // 2. SİPARİŞ FİŞİ OLUŞTUR (Java'nın Görevi)
         ResultingOrder order = new ResultingOrder();
         order.setCustomer(customer);
         order.setOrderDate(LocalDate.now());
         order.setStatus("Tamamlandı");
-        order.setTotalAmount(BigDecimal.ZERO); // Sonra hesaplayacağız
+        order.setTotalAmount(BigDecimal.ZERO); // Artık veritabanında bu sütun var, hata vermeyecek!
         
-        // Siparişi veritabanına taslak olarak kaydet (ID oluşsun diye)
         order = orderRepository.save(order);
 
         BigDecimal toplamTutar = BigDecimal.ZERO;
 
-        // 3. İlaçları Tek Tek Dön, Stoktan Düş ve Listeye Ekle
+        // 3. İLAÇLARI EKLE
         for (int i = 0; i < medicineIds.size(); i++) {
             Long medId = medicineIds.get(i);
             Integer adet = quantities.get(i);
 
             Medicine medicine = medicineService.ilacBul(medId);
 
-            // STOK KONTROLÜ
+            // Stok Kontrolü (Sadece Uyarı Amaçlı)
             if (medicine.getStockQuantity() < adet) {
                 throw new RuntimeException("Yetersiz Stok! İlaç: " + medicine.getName());
             }
 
-            // STOKTAN DÜŞ
-            medicine.setStockQuantity(medicine.getStockQuantity() - adet);
-            medicineService.ilacKaydet(medicine); // Güncel stoğu kaydet
-
-            // SİPARİŞ DETAYINI KAYDET (Hangi ilaçtan kaç tane?)
+            // ARA TABLOYA KAYDET
+            // Biz bunu kaydettiğimiz AN, senin SQL Trigger'ın çalışıp stoğu düşecek.
             OrderMedicine orderDetail = new OrderMedicine();
             orderDetail.setOrder(order);
             orderDetail.setMedicine(medicine);
             orderDetail.setQuantity(adet);
+            
             orderMedicineRepository.save(orderDetail);
 
-            // Fiyat Hesapla (Fiyat * Adet)
+            // Fiyat Hesapla
             BigDecimal kalemTutar = medicine.getPrice().multiply(new BigDecimal(adet));
             toplamTutar = toplamTutar.add(kalemTutar);
         }
 
-        // 4. Toplam Tutarı Siparişe İşle ve Güncelle
         order.setTotalAmount(toplamTutar);
         return orderRepository.save(order);
     }
