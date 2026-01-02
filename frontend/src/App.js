@@ -1,86 +1,27 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import './App.css';
+
+// Bileşenler
+import Sidebar from './components/SideBar';
+import Header from './components/Header';
 
 function App() {
-  const [ilaclar, setIlaclar] = useState([]);
-
-  // Verileri Çek
-  const fetchIlaclar = () => {
-    axios.get('http://localhost:8080/api/medicines')
-      .then(response => setIlaclar(response.data))
-      .catch(error => console.error("Veri Çekme Hatası:", error));
-  };
-
-  useEffect(() => {
-    fetchIlaclar();
-  }, []);
-
-  // --- SATIŞ YAP FONKSİYONU ---
-  const satisYap = (ilacId, ilacAdi) => {
-    
-    // Veritabanındaki Müşteri ID'si (Bunu 60 olarak belirlemiştik)
-    const MUSTERI_ID = 60; 
-
-    const satisPaketi = {
-      customerId: MUSTERI_ID,
-      medicineIds: [ilacId], 
-      quantities: [1]      
-    };
-
-    axios.post('http://localhost:8080/api/orders/satis', satisPaketi)
-      .then(response => {
-        alert(`✅ SATIŞ BAŞARILI!\n\nSatılan: ${ilacAdi}\nFatura Tutarı: ${response.data.totalAmount} ₺`);
-        fetchIlaclar(); // Stokları güncellemek için listeyi yenile
-      })
-      .catch(error => {
-        console.error("Satış Hatası:", error);
-        alert("❌ HATA: Satış yapılamadı. Stok yetersiz olabilir veya veritabanı bağlantısı koptu.");
-      });
-  };
-
   return (
-    <div className="container mt-5">
-      <h2 className="text-center mb-4">🛒 Hızlı Satış Ekranı</h2>
-      
-      <div className="card shadow">
-        <div className="card-body">
-          <table className="table table-striped table-hover align-middle">
-            <thead className="table-dark">
-              <tr>
-                <th>ID</th>
-                <th>İlaç Adı</th>
-                <th>Fiyat</th>
-                <th>Stok</th>
-                <th className="text-center">İşlem</th>
-              </tr>
-            </thead>
-            <tbody>
-              {ilaclar.map(ilac => (
-                <tr key={ilac.medicineId}>
-                  <td>{ilac.medicineId}</td>
-                  <td className="fw-bold">{ilac.name}</td>
-                  <td>{ilac.price} ₺</td>
-                  <td>
-                    {ilac.stockQuantity < 10 
-                      ? <span className="badge bg-danger">{ilac.stockQuantity} (Kritik)</span> 
-                      : <span className="badge bg-success">{ilac.stockQuantity}</span>
-                    }
-                  </td>
-                  <td className="text-center">
-                    <button 
-                        className="btn btn-primary btn-sm px-4"
-                        onClick={() => satisYap(ilac.medicineId, ilac.name)}
-                        disabled={ilac.stockQuantity <= 0}
-                    >
-                        Satış Yap 💰
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+    <div className="App">
+      {/* 1. Sol Menü */}
+      <Sidebar />
+
+      {/* 2. Üst Bar */}
+      <Header />
+
+      {/* 3. Ana İçerik Alanı (Şimdilik boş, sonra dolduracağız) */}
+      <div className="main-content">
+        <h3 className="text-secondary">Hoş Geldiniz 👋</h3>
+        <p className="text-muted">Buraya istatistik kartları ve grafikler gelecek.</p>
+        
+        {/* Test Amaçlı Boşluk */}
+        <div style={{height: '1000px'}}></div>
       </div>
     </div>
   );

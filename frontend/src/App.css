@@ -1,38 +1,93 @@
-.App {
-  text-align: center;
+/* Genel Ayarlar */
+body {
+  background-color: #f4f7fa; /* Tasarımdaki açık gri arka plan */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  overflow-x: hidden;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
+/* Sidebar (Sol Menü) */
+.sidebar {
   min-height: 100vh;
+  width: 250px;
+  background-color: #f8f9fc;
+  border-right: 1px solid #e3e6f0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  padding-top: 20px;
+}
+
+.sidebar-brand {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #2c3e50;
+  padding: 15px 25px;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
 }
 
-.App-link {
-  color: #61dafb;
+.sidebar-menu .nav-link {
+  color: #6c757d;
+  font-weight: 500;
+  padding: 12px 25px;
+  display: flex;
+  align-items: center;
+  transition: all 0.3s;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.sidebar-menu .nav-link:hover, .sidebar-menu .nav-link.active {
+  color: #198754; /* Eczane Yeşili */
+  background-color: #e8f5e9;
+  border-right: 4px solid #198754;
+}
+
+.sidebar-menu .nav-link svg {
+  margin-right: 10px;
+  font-size: 1.1rem;
+}
+
+/* Header (Üst Menü) */
+.top-header {
+  margin-left: 250px; /* Sidebar kadar boşluk bırak */
+  background-color: white;
+  padding: 15px 30px;
+  box-shadow: 0 .15rem 1.75rem 0 rgba(58,59,69,.15);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.search-bar {
+  background-color: #f8f9fc;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 20px;
+  width: 300px;
+}
+
+.profile-section {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.icon-btn {
+  color: #b0b3b8;
+  font-size: 1.2rem;
+  cursor: pointer;
+  position: relative;
+}
+
+.badge-notify {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  font-size: 0.6rem;
+}
+
+/* Ana İçerik Alanı */
+.main-content {
+  margin-left: 250px;
+  padding: 30px;
 }
