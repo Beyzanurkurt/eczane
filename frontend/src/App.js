@@ -1,4 +1,5 @@
 import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
@@ -6,24 +7,41 @@ import './App.css';
 import Sidebar from './components/SideBar';
 import Header from './components/Header';
 
+// Sayfalar
+import Dashboard from './pages/Dashboard';
+import StokTakibi from './pages/StokTakibi';
+
 function App() {
   return (
-    <div className="App">
-      {/* 1. Sol Menü */}
-      <Sidebar />
-
-      {/* 2. Üst Bar */}
-      <Header />
-
-      {/* 3. Ana İçerik Alanı (Şimdilik boş, sonra dolduracağız) */}
-      <div className="main-content">
-        <h3 className="text-secondary">Hoş Geldiniz 👋</h3>
-        <p className="text-muted">Buraya istatistik kartları ve grafikler gelecek.</p>
+    <Router>
+      <div className="App d-flex"> {/* d-flex: Ekranı yan yana dizer */}
         
-        {/* Test Amaçlı Boşluk */}
-        <div style={{height: '1000px'}}></div>
+        {/* SOL TARA: MENÜ */}
+        <Sidebar />
+
+        {/* SAĞ TARAF: HEADER + İÇERİK (Wrapper) */}
+        <div className="content-wrapper">
+          
+          {/* Üst Bar */}
+          <Header />
+
+          {/* Değişen Sayfa İçeriği */}
+          <div className="main-content">
+            <Routes>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/stok" element={<StokTakibi />} />
+              
+              {/* Diğer Rotalar */}
+              <Route path="/recete" element={<div className="p-4">🚧 Reçete Sayfası</div>} />
+              <Route path="/satislar" element={<div className="p-4">🚧 Satışlar Sayfası</div>} />
+              <Route path="/raporlar" element={<div className="p-4">🚧 Raporlar Sayfası</div>} />
+              <Route path="/musteriler" element={<div className="p-4">🚧 Müşteriler Sayfası</div>} />
+            </Routes>
+          </div>
+
+        </div>
       </div>
-    </div>
+    </Router>
   );
 }
 

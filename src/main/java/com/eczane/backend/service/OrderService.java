@@ -16,51 +16,52 @@ public class OrderService {
     private final MedicineService medicineService;
     private final OrderMedicineRepository orderMedicineRepository;
     private final CustomerRepository customerRepository;
+    // YENİ EKLENEN REPO:
+    private final IncomingOrderRepository incomingOrderRepository;
 
-    public OrderService(OrderRepository orderRepository, MedicineService medicineService, 
-                        OrderMedicineRepository orderMedicineRepository, CustomerRepository customerRepository) {
+    // --- CONSTRUCTOR (YAPICI METOT) ---
+    // Hatayı burası çözecek. incomingOrderRepository'yi buraya parametre olarak ekliyoruz.
+    public OrderService(OrderRepository orderRepository, 
+                        MedicineService medicineService, 
+                        OrderMedicineRepository orderMedicineRepository, 
+                        CustomerRepository customerRepository,
+                        IncomingOrderRepository incomingOrderRepository) { // <-- EKLENDİ
         this.orderRepository = orderRepository;
         this.medicineService = medicineService;
         this.orderMedicineRepository = orderMedicineRepository;
         this.customerRepository = customerRepository;
+        this.incomingOrderRepository = incomingOrderRepository; // <-- EKLENDİ (Artık initialize edildi)
     }
 
+    // --- MÜŞTERİYE SATIŞ FONKSİYONU ---
     @Transactional
     public ResultingOrder satisYap(Long customerId, List<Long> medicineIds, List<Integer> quantities) {
-        
-        // 1. MÜŞTERİ SEÇİMİ (Garanti Yöntem)
-        // ID hatası almamak için veritabanındaki ilk müşteriyi seçiyoruz.
+        // Müşteri bulma (Garanti yöntem)
         List<Customer> musteriler = customerRepository.findAll();
         if (musteriler.isEmpty()) {
-            throw new RuntimeException("Sistemde kayıtlı müşteri yok! Önce veritabanına müşteri ekleyin.");
+            throw new RuntimeException("Sistemde kayıtlı müşteri yok!");
         }
-        Customer customer = musteriler.get(0); 
+        Customer customer = musteriler.get(0);
 
-        // 2. SİPARİŞ FİŞİ OLUŞTUR (Java'nın Görevi)
         ResultingOrder order = new ResultingOrder();
         order.setCustomer(customer);
         order.setOrderDate(LocalDate.now());
         order.setStatus("Tamamlandı");
-        order.setTotalAmount(BigDecimal.ZERO); // Artık veritabanında bu sütun var, hata vermeyecek!
+        order.setTotalAmount(BigDecimal.ZERO);
         
         order = orderRepository.save(order);
 
         BigDecimal toplamTutar = BigDecimal.ZERO;
 
-        // 3. İLAÇLARI EKLE
         for (int i = 0; i < medicineIds.size(); i++) {
             Long medId = medicineIds.get(i);
             Integer adet = quantities.get(i);
-
             Medicine medicine = medicineService.ilacBul(medId);
 
-            // Stok Kontrolü (Sadece Uyarı Amaçlı)
             if (medicine.getStockQuantity() < adet) {
                 throw new RuntimeException("Yetersiz Stok! İlaç: " + medicine.getName());
             }
 
-            // ARA TABLOYA KAYDET
-            // Biz bunu kaydettiğimiz AN, senin SQL Trigger'ın çalışıp stoğu düşecek.
             OrderMedicine orderDetail = new OrderMedicine();
             orderDetail.setOrder(order);
             orderDetail.setMedicine(medicine);
@@ -68,12 +69,44 @@ public class OrderService {
             
             orderMedicineRepository.save(orderDetail);
 
-            // Fiyat Hesapla
             BigDecimal kalemTutar = medicine.getPrice().multiply(new BigDecimal(adet));
             toplamTutar = toplamTutar.add(kalemTutar);
         }
 
         order.setTotalAmount(toplamTutar);
         return orderRepository.save(order);
+    }
+
+    // --- TEDARİKÇİDEN MAL ALIM FONKSİYONU (YENİ) ---
+    @Transactional
+    public IncomingOrder stokEkle(Long supplierId, List<Long> medicineIds, List<Integer> quantities, String irsaliyeNo) {
+        
+        // 1. Sipariş Ana Kaydı
+        IncomingOrder order = new IncomingOrder();
+        order.setOrderDate(LocalDate.now());
+        order.setStatus("Tedarik Edildi"); // Order sınıfından geliyor (@Data sayesinde çalışır)
+        order.setTotalAmount(BigDecimal.ZERO); 
+        order.setSupplierId(supplierId);   // IncomingOrder sınıfından geliyor
+        order.setSupplierOrderCode(irsaliyeNo);
+
+        order = incomingOrderRepository.save(order);
+
+        // 2. İlaçları Ekle
+        for (int i = 0; i < medicineIds.size(); i++) {
+            Long medId = medicineIds.get(i);
+            Integer adet = quantities.get(i);
+
+            Medicine medicine = medicineService.ilacBul(medId);
+
+            OrderMedicine orderDetail = new OrderMedicine();
+            orderDetail.setOrder(order);
+            orderDetail.setMedicine(medicine);
+            orderDetail.setQuantity(adet);
+            
+            // Trigger burada devreye girip stoğu arttıracak
+            orderMedicineRepository.save(orderDetail);
+        }
+
+        return order;
     }
 }
