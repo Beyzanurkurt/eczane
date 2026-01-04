@@ -1,6 +1,22 @@
 import React from 'react';
+import axios from 'axios';
 
 const MedicineTable = ({ ilaclar, onSatisYap }) => {
+
+const zamYap = async (id) => {
+    const miktar = prompt("Bu ilaca kaç TL zam yapmak istiyorsunuz?");
+    if (miktar) {
+        try {
+            // 9090 yerine 8080 yazıyoruz
+            await axios.put(`http://localhost:8080/api/medicines/${id}/zam?miktar=${miktar}`);
+            alert("Başarılı! Fiyat güncellendi.");
+            window.location.reload();
+        } catch (error) {
+            console.error("Hata:", error);
+            alert("Zam yapılamadı! Backend açık mı?");
+        }
+    }
+};
   return (
     <div className="card shadow mb-4">
       <div className="card-header py-3 bg-white">
@@ -44,6 +60,12 @@ const MedicineTable = ({ ilaclar, onSatisYap }) => {
                     >
                       💸 Satış Yap
                     </button>
+                    <button
+                        className="btn btn-warning btn-sm rounded-pill px-3 ms-2" // ms-2: Soldan boşluk bırakır
+                        onClick={() => zamYap(ilac.medicineId)}
+                      >
+                        💰 Zam Yap
+                      </button>
                   </td>
                 </tr>
               ))}

@@ -85,7 +85,7 @@ public class OrderService {
         IncomingOrder order = new IncomingOrder();
         order.setOrderDate(LocalDate.now());
         order.setStatus("Tedarik Edildi"); // Order sınıfından geliyor (@Data sayesinde çalışır)
-        order.setTotalAmount(BigDecimal.ZERO); 
+        order.setTotalAmount(BigDecimal.ZERO);
         order.setSupplierId(supplierId);   // IncomingOrder sınıfından geliyor
         order.setSupplierOrderCode(irsaliyeNo);
 

@@ -2,8 +2,10 @@ package com.eczane.backend.service;
 
 import com.eczane.backend.entity.Medicine;
 import com.eczane.backend.repository.MedicineRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,5 +32,10 @@ public class MedicineService {
     // İlaç kaydetme/güncelleme (Stok düştüğünde burayı kullanacağız)
     public void ilacKaydet(Medicine medicine) {
         medicineRepository.save(medicine);
+    }
+
+    @Transactional // Bu çok önemli! Prosedürler transactional çalışmak ister.
+    public void ilacaZamYap(Integer id, BigDecimal zamMiktari) {
+        medicineRepository.zamYap(id, zamMiktari);
     }
 }
