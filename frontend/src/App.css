@@ -1,0 +1,111 @@
+/* GENEL AYARLAR */
+body {
+  background-color: #f4f7fa;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  overflow-x: hidden; /* Yatay kaymayı engelle */
+  margin: 0;
+}
+
+.App {
+  min-height: 100vh;
+  display: flex; /* Yan yana dizme modu */
+  width: 100%;
+}
+
+/* --- SOL MENÜ (SIDEBAR) --- */
+.sidebar {
+  width: 250px;     /* Sabit Genişlik */
+  min-width: 250px; /* Asla küçülme! */
+  background-color: #f8f9fc;
+  border-right: 1px solid #e3e6f0;
+  height: 100vh;    /* Tam boy */
+  position: sticky; /* Sayfayla beraber kay ama yapışık kal */
+  top: 0;
+  z-index: 100;
+  padding-top: 20px;
+}
+
+.sidebar-brand {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #2c3e50;
+  padding: 15px 25px;
+  display: flex;
+  align-items: center;
+}
+
+.sidebar-menu .nav-link {
+  color: #6c757d;
+  font-weight: 500;
+  padding: 12px 25px;
+  display: flex;
+  align-items: center;
+  transition: all 0.3s;
+  text-decoration: none;
+}
+
+.sidebar-menu .nav-link:hover, .sidebar-menu .nav-link.active {
+  color: #198754;
+  background-color: #e8f5e9;
+  border-right: 4px solid #198754;
+}
+
+.sidebar-menu .nav-link svg {
+  margin-right: 10px;
+  font-size: 1.1rem;
+}
+
+/* --- SAĞ TARAF (HEADER + İÇERİK) --- */
+.content-wrapper {
+  flex-grow: 1; /* Kalan tüm boşluğu doldur */
+  display: flex;
+  flex-direction: column; /* Alt alta diz (Header üstte, İçerik altta) */
+  width: calc(100% - 250px); /* Genişlik taşmasını engelle */
+}
+
+/* Header */
+.top-header {
+  background-color: white;
+  padding: 15px 30px;
+  box-shadow: 0 .15rem 1.75rem 0 rgba(58,59,69,.15);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%; /* Bulunduğu kutuyu doldur */
+}
+
+/* İçerik Alanı */
+.main-content {
+  padding: 30px;
+  width: 100%;
+  overflow-y: auto;
+}
+
+/* Diğer Ufaklar */
+.search-bar {
+  background-color: #f8f9fc;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 20px;
+  width: 300px;
+}
+
+.profile-section {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.icon-btn {
+  color: #b0b3b8;
+  font-size: 1.2rem;
+  cursor: pointer;
+  position: relative;
+}
+
+.badge-notify {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  font-size: 0.6rem;
+}

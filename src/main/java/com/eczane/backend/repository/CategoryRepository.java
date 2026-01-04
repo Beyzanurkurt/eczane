@@ -1,0 +1,8 @@
+package com.eczane.backend.repository;
+
+import com.eczane.backend.entity.Category;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface CategoryRepository extends JpaRepository<Category, Long> {
+}
+//İLK YEDİ TANE REPO OLUŞTURULDU 

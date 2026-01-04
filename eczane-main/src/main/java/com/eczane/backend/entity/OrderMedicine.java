@@ -10,7 +10,7 @@ public class OrderMedicine {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // Senin SQL'deki "id INT GENERATED..." sütunu
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "order_id")
@@ -22,4 +22,4 @@ public class OrderMedicine {
 
     @Column(nullable = false)
     private Integer quantity;
-};
+}

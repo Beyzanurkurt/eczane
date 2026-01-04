@@ -6,9 +6,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
-@RequestMapping("/api/medicines") // Tarayıcıdaki adresimiz bu olacak
-@CrossOrigin(origins = "http://localhost:3000") // React'in portu (genelde 3000) için izin ver
+@RestController // Burası bir API kapısıdır
+@RequestMapping("/api/medicines") // Bu adresten gelen isteklere bak
+@CrossOrigin(origins = "http://localhost:3000") // React'in (3000 portu) buraya erişmesine izin ver
 public class MedicineController {
 
     private final MedicineService medicineService;
@@ -17,16 +17,17 @@ public class MedicineController {
         this.medicineService = medicineService;
     }
 
-    // GET İsteği: Tüm ilaçları getir
+    // GET İsteği: Tüm ilaçları listele
     // Adres: http://localhost:8080/api/medicines
     @GetMapping
     public List<Medicine> tumIlaclariGetir() {
         return medicineService.tumIlaclariGetir();
     }
-    
-    // POST İsteği: Yeni ilaç ekle (Arkadaşının kullanacağı kısım)
+
+    // POST İsteği: Yeni ilaç ekle
+    // React'ten JSON verisi gelir, bunu Java nesnesine çevirip kaydeder
     @PostMapping
-    public void ilacEkle(@RequestBody Medicine medicine) {
-        medicineService.ilacKaydet(medicine);
+    public Medicine yeniIlacEkle(@RequestBody Medicine medicine) {
+        return medicineService.ilacKaydet(medicine);
     }
 }
