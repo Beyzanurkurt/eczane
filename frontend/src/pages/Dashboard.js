@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../App.css';
-
+import CustomAlert from '../components/CustomAlert';
 // İkonlar
 import { FaBoxes, FaShoppingCart, FaFilePrescription, FaExclamationCircle } from 'react-icons/fa';
 
@@ -17,6 +17,8 @@ const Dashboard = () => {
   const [ilaclar, setIlaclar] = useState([]);
   const [grafikVerisi, setGrafikVerisi] = useState([]); // Yeni State
   const [bekleyenRecete, setBekleyenRecete] = useState(0); // YENİ STATE
+  const [alertData, setAlertData] = useState(null);
+
 
   // --- TÜM VERİLERİ ÇEK ---
   const verileriGuncelle = () => {
@@ -40,21 +42,35 @@ const Dashboard = () => {
   }, []);
 
   // --- SATIŞ YAP FONKSİYONU (Backend'e Bağlı) ---
-  const satisYap = (ilacId) => {
+ const satisYap = (ilacId) => {
     const satisPaketi = { customerId: 60, medicineIds: [ilacId], quantities: [1] };
-    axios.post('http://localhost:8080/api/orders/satis', satisPaketi)
-      .then(res => {
-        alert("Satış Başarılı! ✅");
-        verileriGuncelle(); // Grafik ve Stok anında güncellensin!
-      })
-      .catch(err => alert("Hata!"));
-  };
 
+    axios.post('http://localhost:8080/api/orders/satis', satisPaketi)
+      .then(response => {
+        // Backend'den dönen tutarı ekrana yazdıralım
+        const donenTutar = response.data.totalAmount;
+        alert(`✅ Satış Başarılı! \nHesaplanan Tutar: ${donenTutar} ₺`);
+        
+        // Verileri hemen güncelle
+        verileriGuncelle();
+      })
+      .catch(error => {
+        console.error("Satış Hatası:", error);
+        alert("❌ Hata oluştu!");
+      });
+  };
   const toplamStok = ilaclar.reduce((acc, ilac) => acc + ilac.stockQuantity, 0);
   const kritikStokSayisi = ilaclar.filter(ilac => ilac.stockQuantity < 20).length;
   // Günlük ciroyu grafikten alabiliriz (Bugünün verisi, listenin son elemanı)
   const gunlukSatis = grafikVerisi.length > 0 ? grafikVerisi[grafikVerisi.length - 1].satis : 0;
-    return (
+    
+  
+  
+  
+  
+  
+  
+  return (
     <div className="App">
        
        <div className="main-content">

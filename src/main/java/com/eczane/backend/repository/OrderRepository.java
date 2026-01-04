@@ -1,19 +1,27 @@
 package com.eczane.backend.repository;
 
-import com.eczane.backend.entity.Order; // Entity adını kontrol et (ResultingOrder da olabilir, Order da)
+import com.eczane.backend.entity.Order;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public interface OrderRepository extends JpaRepository<Order, Long> { // ID tipi Integer veya Long olabilir, kontrol et
-    
-    // Belirli bir tarihteki tamamlanmış satışların toplam tutarını getirir
-    @Query("SELECT COALESCE(SUM(o.totalAmount), 0) FROM Order o WHERE o.orderDate = :date AND o.status = 'Tamamlandı'")
-    BigDecimal gunlukCiroGetir(@Param("date") LocalDate date);
-    // src/main/java/com/eczane/backend/repository/OrderRepository.java
+public interface OrderRepository extends JpaRepository<Order, Integer> {
 
-@Query("SELECT COUNT(o) FROM ResultingOrder o WHERE o.status IN ('Bekliyor', 'Hazırlanıyor')")
-long bekleyenReceteSayisi();
+    // --- DÜZELTİLEN SORGU ---
+    // HATA ÇÖZÜMÜ: 'CURRENT_DATE' yerine ':date' parametresini geri koyduk.
+    // Artık döngü hangi günü sorarsa (Pzt, Sal, Çar...) O GÜNÜN cirosunu verecek.
+    
+    @Query(value = "SELECT COALESCE(SUM(o.total_amount), 0) " +
+                   "FROM orders o " +
+                   "INNER JOIN resulting_order ro ON o.order_id = ro.order_id " +
+                   "WHERE o.order_date = :date AND o.status = 'Tamamlandı'", 
+           nativeQuery = true)
+    BigDecimal gunlukCiroGetir(@Param("date") LocalDate date);
+
+    // Bekleyen Reçeteler
+    @Query(value = "SELECT COUNT(*) FROM resulting_order WHERE status IN ('Bekliyor', 'Hazırlanıyor')", 
+           nativeQuery = true)
+    long bekleyenReceteSayisi();
 }

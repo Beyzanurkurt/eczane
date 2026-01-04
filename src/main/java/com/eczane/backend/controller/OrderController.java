@@ -37,7 +37,7 @@ public class OrderController {
     public List<Map<String, Object>> getHaftalikSatis() {
         List<Map<String, Object>> veriListesi = new ArrayList<>();
         LocalDate bugun = LocalDate.now();
-
+        
         // Son 7 günü hesapla
         for (int i = 6; i >= 0; i--) {
             LocalDate tarih = bugun.minusDays(i);

@@ -42,7 +42,7 @@ const MedicineTable = ({ ilaclar, onSatisYap }) => {
                       onClick={() => onSatisYap(ilac.medicineId)}
                       disabled={ilac.stockQuantity <= 0}
                     >
-                      💸 Satış Yap
+                       Satış Yap
                     </button>
                   </td>
                 </tr>

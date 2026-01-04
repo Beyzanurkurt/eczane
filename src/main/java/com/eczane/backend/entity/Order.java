@@ -5,6 +5,8 @@ import lombok.Data; // BU ÇOK ÖNEMLİ! Getter/Setter'ları bu oluşturur.
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 @Entity
 @Table(name = "orders")
 @Data // <-- BU SATIR EKSİKSE "setTotalAmount" ÇALIŞMAZ
@@ -25,5 +27,7 @@ public class Order {
     @Column(name = "status")
     private String status;
     
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate tedarikTarihi;     
     // İlişki varsa (Customer vb.) buradadır
 }

@@ -16,4 +16,18 @@ public class IncomingOrder extends Order {
 
     @Column(name = "supplier_order_code")
     private String supplierOrderCode;
+
+    // --- BU KISMI EKLE ---
+@ManyToOne
+@JoinColumn(name = "branch_id") // Veritabanındaki 'branch_id' sütununa bağlanacak
+private PharmacyBranch pharmacyBranch; // Senin sınıfının adı 'Branch' ise burayı 'Branch branch' yap
+
+public PharmacyBranch getPharmacyBranch() {
+    return pharmacyBranch;
+}
+
+public void setPharmacyBranch(PharmacyBranch pharmacyBranch) {
+    this.pharmacyBranch = pharmacyBranch;
+}
+// ---------------------
 }

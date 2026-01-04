@@ -26,7 +26,7 @@ const Header = () => {
         
         <div className="d-flex align-items-center ms-3">
             <div className="text-end me-2 d-none d-lg-block">
-                <span className="d-block small fw-bold text-dark">Ahmet Kaya</span>
+                <span className="d-block small fw-bold text-dark">Beyza Nur</span>
                 <span className="d-block small text-muted">Eczacı</span>
             </div>
             <FaUserCircle size={35} className="text-secondary" />
