@@ -1,11 +1,11 @@
 package com.eczane.backend.service;
 
+// Paket ismin farklı olabilir, kendi Branch sınıfını seç
 import com.eczane.backend.entity.*;
 // Bunu da ekle
 import com.eczane.backend.repository.*;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
-import com.eczane.backend.entity.PharmacyBranch; // Paket ismin farklı olabilir, kendi Branch sınıfını seç
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -106,10 +106,9 @@ public class OrderService {
         order.setTotalAmount(BigDecimal.ZERO); 
         order.setSupplierId(supplierId);   // IncomingOrder sınıfından geliyor
         order.setSupplierOrderCode(irsaliyeNo);
-        PharmacyBranch defaultBranch = pharmacyBranchRepository.findById(2L).orElse(null); 
+        PharmacyBranch defaultBranch = pharmacyBranchRepository.findById(1L).orElse(null); 
         order.setPharmacyBranch(defaultBranch); 
         order = incomingOrderRepository.save(order);
-        
         // 2. İlaçları Ekle
         for (int i = 0; i < medicineIds.size(); i++) {
             Long medId = medicineIds.get(i);
