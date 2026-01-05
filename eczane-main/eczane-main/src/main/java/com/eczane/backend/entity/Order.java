@@ -2,8 +2,6 @@ package com.eczane.backend.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
-
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
@@ -19,10 +17,4 @@ public class Order {
 
     @Column(name = "order_date", nullable = false)
     private LocalDate orderDate;
-
-    private String status;          // Durum (Tedarik Edildi vs.)
-    private java.math.BigDecimal totalAmount; // Toplam Tutar
-    private Long supplierId;        // Tedarikçi ID
-
-
 }
